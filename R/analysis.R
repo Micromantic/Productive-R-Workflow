@@ -1,20 +1,23 @@
 library(tidyverse)
+library(readxl)
 library(here)
+
+source("R/functions_learn_by_doing.R")
+
+pinguins_data <- read_rds("data/data_clean.rds")
 
 options(scipen = 100)
 
-raw_pinguins_data <- read_csv("data/raw_pinguins_data.csv")
-
-summary(raw_pinguins_data)
+summary(pinguins_data)
 
 # Means
-adelie_bill_length_means <- raw_pinguins_data %>%
+adelie_bill_length_means <- pinguins_data %>%
   filter(species == "Adelie") %>%
   group_by(island) %>%
   summarise(mean_bill_length = num(mean(bill_length_mm, na.rm = TRUE), digits = 2))
 
 # Plot
-raw_pinguins_data %>%
+pinguins_data %>%
   na.omit() %>%
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species, shape = species)) +
   geom_point() + 
