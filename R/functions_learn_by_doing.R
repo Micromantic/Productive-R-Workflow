@@ -25,16 +25,11 @@ plot_length_depth <- function(data, selected_island, selected_species) {
     na.omit() %>%
     filter(species == selected_species & island == selected_island) %>%
     ggplot(aes(x = bill_length_mm,
-               y = bill_depth_mm,
-               color = species,
-               shape = species)) +
+               y = bill_depth_mm)) +
     geom_point() + 
-    labs(title = paste0(selected_species, " Penguin Bill Dimensions in ", selected_island),
+    labs(title = paste0(selected_species, " penguin bill dimensions in ", selected_island),
          x = "Bill Length (mm)",
-         y = "Bill Depth (mm)") +
-    scale_shape_manual(values = c("Adelie" = 16,
-                                  "Chinstrap" = 17,
-                                  "Gentoo" = 18))
+         y = "Bill Depth (mm)")
   
   return(plot)
 }

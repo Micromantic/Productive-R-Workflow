@@ -1,0 +1,99 @@
+---
+title: "Penguin Analysis"
+format:
+  html:
+    code-fold: true
+    code-summary: "Show the code"
+editor: visual
+fig-width: 6
+fig-cap-location: margin
+---
+
+## Exploratory analysis of the penguin data set
+
+This report is an assignment of the [Productive R Workflow](https://www.productive-r-workflow.com/) course.
+
+The goal is to build a Quarto report using a script that loads the [palmerpenguins](https://allisonhorst.github.io/palmerpenguins/) data set and performs an exploratory analysis.
+
+Since most of the data processing is done in other scripts, we will only load `tidyverse` and `here` in this report.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(patchwork)
+library(readxl)
+library(here)
+
+options(scipen = 100)
+
+```
+
+## Data loading
+
+The data is already loaded and prepared in our data folder, as well as some custom functions.
+
+```{r}
+#| echo: true
+source(here("R/functions_learn_by_doing.R"))
+
+penguins_data <- read_rds(here("data/data_clean.rds"))
+
+```
+
+![The culmen (bill) length and depth are measured as shown](images/culmen_depth.png){fig-alt="Culmen depth diagram" fig-align="center"}
+
+## Descriptive analytics
+
+###### Summary of the data
+
+```{r}
+summary(penguins_data)
+```
+
+###### Average bill length and depth by species
+
+```{r}
+#| layout-ncol: 2
+penguins_data %>%
+  group_by(species) %>%
+  summarise(mean_bill_length = num(mean(bill_length_mm, na.rm = TRUE), digits = 2))
+
+penguins_data %>%
+  group_by(species) %>%
+  summarise(mean_bill_depth = num(mean(bill_depth_mm, na.rm = TRUE), digits = 2))
+```
+
+###### Scatter plot with Bill dimensions (length and depth) by species
+
+```{r}
+#|  fig.align="center"
+penguins_data %>%
+  na.omit() %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species, shape = species)) +
+  geom_point() + 
+  labs(title = "Penguin Bill Dimensions",
+       x = "Bill Length (mm)",
+       y = "Bill Depth (mm)") +
+  scale_shape_manual(values = c("Adelie" = 16,
+                                "Chinstrap" = 17,
+                                "Gentoo" = 18)) +
+  scale_color_manual(values = c("Adelie" = "#ff8100",
+                                "Chinstrap" = "#c25ecb",
+                                "Gentoo" = "#056e75"))
+```
+
+###### Scatterplots with Bill dimensions (length and depth) by species
+
+```{r}
+#|  fig.align="center", fig.width: 6, fig.cap='Length and Depth are directly correlated'
+p1 <- plot_length_depth(data = penguins_data, selected_island = "Dream", selected_species = "Chinstrap")
+p2 <- plot_length_depth(data = penguins_data, selected_island = "Biscoe", selected_species = "Gentoo")
+p3 <- plot_length_depth(data = penguins_data, selected_island = "Torgersen", selected_species = "Adelie")
+
+p1 + p2 + p3
+```
+
+## Data source
+
+![Artwork by \@allison_horst](https://allisonhorst.github.io/palmerpenguins/reference/figures/lter_penguins.png){fig-alt="Meet the Palmer penguins" fig-align="center"}
+
+Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarctica) penguin data. R package version 0.1.0. <https://allisonhorst.github.io/palmerpenguins/>. doi: 10.5281/zenodo.3960218.
