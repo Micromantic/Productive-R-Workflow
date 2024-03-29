@@ -6,6 +6,9 @@ author:
 date: last-modified
 title-block-banner: "#D81E05"
 title-block-banner-color: "white"
+theme:
+  light: flatly
+  dark: darkly
 format:
   html:
     toc: true
@@ -93,6 +96,7 @@ ggplotly(penguins_data %>%
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species, shape = species)) +
   geom_point() + 
   labs(title = "Penguin Bill Dimensions",
+       subtitle = 'Length and Depth are negatively correlated when we look at all data points',
        x = "Bill Length (mm)",
        y = "Bill Depth (mm)") +
   scale_shape_manual(values = c("Adelie" = 16,
@@ -101,6 +105,7 @@ ggplotly(penguins_data %>%
   scale_color_manual(values = c("Adelie" = "#ff8100",
                                 "Chinstrap" = "#c25ecb",
                                 "Gentoo" = "#056e75")))
+  
 ```
 
 ### Scatterplots with Bill dimensions (length and depth) by species
