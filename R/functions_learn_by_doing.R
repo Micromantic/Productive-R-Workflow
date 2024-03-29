@@ -34,6 +34,7 @@ plot_length_depth <- function(data, selected_island, selected_species) {
   return(plot)
 }
 
+# Calculate the mean of Adelie bill length by island
 calc_adelie_bill_mean <- function(data, island_name) {
   filtered_data <- data %>%
     filter(species == "Adelie" & island == island_name)
@@ -41,3 +42,17 @@ calc_adelie_bill_mean <- function(data, island_name) {
   return(mean_bill_length)
 }
 
+# Create a scatter plot of one species using bill depth and length
+species_length_depth <- function(data, selected_species, selected_color) {
+  plot <- data %>%
+    na.omit() %>%
+    filter(species == selected_species) %>%
+    ggplot(aes(x = bill_length_mm,
+               y = bill_depth_mm)) +
+    geom_point(color = selected_color) + 
+    labs(title = paste0(selected_species, " bill dimensions"),
+         x = "Bill Length (mm)",
+         y = "Bill Depth (mm)")
+  
+  return(plot)
+}

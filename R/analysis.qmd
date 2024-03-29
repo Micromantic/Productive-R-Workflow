@@ -1,26 +1,44 @@
 ---
-title: "Penguin Analysis"
+title: "Palmer Penguin Data Set Analysis"
+author:
+  name: Daniel Pestana
+  email: danielpestanar@gmail.com
+date: last-modified
+title-block-banner: "#D81E05"
+title-block-banner-color: "white"
 format:
   html:
+    toc: true
+    toc-location: left
+    number-sections: true
     code-fold: true
     code-summary: "Show the code"
+    embed-resources: true
 editor: visual
 fig-width: 6
 fig-cap-location: margin
+css: style.css
 ---
 
-## Exploratory analysis of the penguin data set
+## What is this report about
 
 This report is an assignment of the [Productive R Workflow](https://www.productive-r-workflow.com/) course.
 
 The goal is to build a Quarto report using a script that loads the [palmerpenguins](https://allisonhorst.github.io/palmerpenguins/) data set and performs an exploratory analysis.
 
-Since most of the data processing is done in other scripts, we will only load `tidyverse` and `here` in this report.
+We will load `tidyverse`, `patchwork`, `TD`, `knitr`, `plotly` and `here` in this report.
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
+::: {.callout-note title="Note" collapse="true"}
+This report is done to showcase some of the Quarto features and it's merely academic.
+:::
+
+```{r, warning=FALSE, message=FALSE}
+#| echo: true
 library(tidyverse)
 library(patchwork)
-library(readxl)
+library(knitr)
+library(DT)
+library(plotly)
 library(here)
 
 options(scipen = 100)
@@ -39,34 +57,38 @@ penguins_data <- read_rds(here("data/data_clean.rds"))
 
 ```
 
-![The culmen (bill) length and depth are measured as shown](images/culmen_depth.png){fig-alt="Culmen depth diagram" fig-align="center"}
+![The culmen (bill) length and depth are measured as shown](images/culmen_depth.png){fig-alt="Culmen depth diagram" fig-align="center" width="5in"}
 
 ## Descriptive analytics
 
-###### Summary of the data
+### Summary of the data
 
 ```{r}
 summary(penguins_data)
 ```
 
-###### Average bill length and depth by species
+### Average bill length and depth by species
 
 ```{r}
 #| layout-ncol: 2
-penguins_data %>%
+avg_bill_length <- penguins_data %>%
   group_by(species) %>%
   summarise(mean_bill_length = num(mean(bill_length_mm, na.rm = TRUE), digits = 2))
 
-penguins_data %>%
+avg_bill_depth <- penguins_data %>%
   group_by(species) %>%
   summarise(mean_bill_depth = num(mean(bill_depth_mm, na.rm = TRUE), digits = 2))
+
+kable(avg_bill_length)
+
+kable(avg_bill_depth)
 ```
 
-###### Scatter plot with Bill dimensions (length and depth) by species
+### Scatter plot with Bill dimensions (length and depth)
 
 ```{r}
-#|  fig.align="center"
-penguins_data %>%
+#|  fig.align="center", fig.cap='Length and Depth are negatively correlated when we look at all data points'
+ggplotly(penguins_data %>%
   na.omit() %>%
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species, shape = species)) +
   geom_point() + 
@@ -78,18 +100,25 @@ penguins_data %>%
                                 "Gentoo" = 18)) +
   scale_color_manual(values = c("Adelie" = "#ff8100",
                                 "Chinstrap" = "#c25ecb",
-                                "Gentoo" = "#056e75"))
+                                "Gentoo" = "#056e75")))
 ```
 
-###### Scatterplots with Bill dimensions (length and depth) by species
+### Scatterplots with Bill dimensions (length and depth) by species
 
-```{r}
-#|  fig.align="center", fig.width: 6, fig.cap='Length and Depth are directly correlated'
-p1 <- plot_length_depth(data = penguins_data, selected_island = "Dream", selected_species = "Chinstrap")
-p2 <- plot_length_depth(data = penguins_data, selected_island = "Biscoe", selected_species = "Gentoo")
-p3 <- plot_length_depth(data = penguins_data, selected_island = "Torgersen", selected_species = "Adelie")
+```{r, fig.height=3, fig.width=9}
+#|  fig.align="center", fig.cap='Length and Depth are positively correlated when we split them by species'
+p1 <- species_length_depth(penguins_data, "Chinstrap", "#c25ecb")
+p2 <- species_length_depth(penguins_data, "Gentoo", "#056e75")
+p3 <- species_length_depth(penguins_data, "Adelie", "#ff8100")
 
 p1 + p2 + p3
+```
+
+## Take a look at the data
+
+```{r}
+datatable(penguins_data,
+filter = "top")
 ```
 
 ## Data source
